@@ -9,13 +9,13 @@ export default defineStackbitConfig({
       contentDirs: ["content"], // Root content folder
       models: [
         {
-          name: "Post",          // Model name
-          type: "page",          // Tell editor this is a page
-          urlPath: "/{slug}",    // URL path pattern for pages
-          filePath: "content/pages/{slug}.md", // Where the files live
+          name: "Post",                 // Model name
+          type: "page",                 // Tells editor this is a page
+          urlPath: "/blog/{slug}",      // URL pattern for pages
+          filePath: "content/pages/blog/{slug}.md", // Folder where Markdown files live
           fields: [
             { name: "title", type: "string", required: true },
-            { name: "body", type: "markdown", required: true } // Optional: body content
+            { name: "body", type: "markdown", required: true } // Body content field
           ]
         }
       ]
