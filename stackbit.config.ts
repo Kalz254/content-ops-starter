@@ -1,58 +1,35 @@
-import { defineStackbitConfig, DocumentStringLikeFieldNonLocalized, SiteMapEntry } from '@stackbit/types';
-import { GitContentSource } from '@stackbit/cms-git';
-import { allModels } from 'sources/local/models';
+import { defineStackbitConfig } from "@stackbit/types";
+import { GitContentSource } from "@stackbit/cms-git";
 
-const gitContentSource = new GitContentSource({
-    rootPath: __dirname,
-    contentDirs: ['content'],
-    models: Object.values(allModels),
-    assetsConfig: {
-        referenceType: 'static',
-        staticDir: 'public',
-        uploadDir: 'images',
-        publicPath: '/'
-    }
+export default defineStackbitConfig({
+  contentSources: [
+    new GitContentSource({
+      rootPath: __dirname,
+      contentDirs: ["content/pages"], // Path where your Markdown/JSON pages are stored
+      models: [
+        {
+          name: "Page",           // Model name
+          type: "page",           // Marks it as a page for Visual Editor
+          urlPath: "/{slug}",     // Maps to the page URL
+          filePath: "content/pages/{slug}.md", // Path template for files
+          fields: [
+            { name: "title", type: "string", required: true }, // Page title
+            { name: "body", type: "markdown_content" }         // Page content
+          ]
+        },
+        {
+          name: "BlogPost",
+          type: "page",
+          urlPath: "/blog/{slug}",
+          filePath: "content/blog/{slug}.md",
+          fields: [
+            { name: "title", type: "string", required: true },
+            { name: "excerpt", type: "string" },
+            { name: "body", type: "markdown_content" },
+            { name: "date", type: "date" }
+          ]
+        }
+      ]
+    })
+  ],
 });
-
-export const config = defineStackbitConfig({
-    stackbitVersion: '~0.7.0',
-    ssgName: 'nextjs',
-    nodeVersion: '18',
-    styleObjectModelName: 'ThemeStyle',
-    contentSources: [gitContentSource],
-    presetSource: {
-        type: 'files',
-        presetDirs: ['sources/local/presets']
-    },
-    siteMap: ({ documents, models }): SiteMapEntry[] => {
-        const pageModels = models.filter((model) => model.type === 'page').map((model) => model.name);
-        return documents
-            .filter((document) => pageModels.includes(document.modelName))
-            .map((document) => {
-                let slug = (document.fields.slug as DocumentStringLikeFieldNonLocalized)?.value;
-                if (!slug) return null;
-                /* Remove the leading slash in order to generate correct urlPath
-                regardless of whether the slug is '/', 'slug' or '/slug' */
-                slug = slug.replace(/^\/+/, '');
-                switch (document.modelName) {
-                    case 'PostFeedLayout':
-                        return {
-                            urlPath: '/blog',
-                            document: document
-                        };
-                    case 'PostLayout':
-                        return {
-                            urlPath: `/blog/${slug}`,
-                            document: document
-                        };
-                    default:
-                        return {
-                            urlPath: `/${slug}`,
-                            document: document
-                        };
-                }
-            });
-    }
-});
-
-export default config;
