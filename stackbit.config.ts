@@ -2,20 +2,20 @@ import { GitContentSource } from "@stackbit/cms-git";
 import { defineStackbitConfig } from "@stackbit/types";
 
 export default defineStackbitConfig({
-  stackbitVersion: "0.1.0",  // Required property
+  stackbitVersion: "0.1.0",
   contentSources: [
     new GitContentSource({
       rootPath: __dirname,
-      contentDirs: ["content"], // Root content folder
+      contentDirs: ["content"],
       models: [
         {
-          name: "Post",                 // Model name
-          type: "page",                 // Tells editor this is a page
-          urlPath: "/blog/{slug}",      // URL pattern for pages
-          filePath: "content/pages/blog/{slug}.md", // Folder where Markdown files live
+          name: "Page",
+          type: "page",
+          urlPath: "/{slug}", // this creates the URL automatically
+          filePath: "content/pages/blog/{slug}.md",
           fields: [
             { name: "title", type: "string", required: true },
-            { name: "body", type: "markdown", required: true } // Body content field
+            { name: "body", type: "markdown", required: true }
           ]
         }
       ]
